@@ -6,14 +6,10 @@ import urllib2
 import subprocess
 import logging
 import os
+import argparse
 
 BASE_URL = "http://www.podnapisi.net"
 BASE_SEARCH = BASE_URL + "/he/" + "ppodnapisi/search?sK="
-
-# TODO get this information from the user
-SERIES_NAME = "mad men"
-SEASON = 2
-EPISODE = 6
 
 
 def download_subtitle(series_name, season, episode):
@@ -48,4 +44,13 @@ def download_subtitle(series_name, season, episode):
         os.unlink(zip_filename)
 
 if __name__ == "__main__":
-    download_subtitle(SERIES_NAME, SEASON, EPISODE)
+    parser = argparse.ArgumentParser(description='Download subtitles for a series.')
+    parser.add_argument('name',
+                        help='series_name')
+    parser.add_argument('season', type=int,
+                        help='episode number')
+    parser.add_argument('episode', type=int,
+                        help='episode number')
+
+    args = parser.parse_args()
+    download_subtitle(args.name, args.season, args.episode)
