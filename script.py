@@ -3,7 +3,8 @@
 from BeautifulSoup import BeautifulSOAP
 
 import urllib2
-import zlib
+import subprocess
+import logging
 
 BASE_URL = "http://www.podnapisi.net"
 BASE_SEARCH = BASE_URL + "/he/" + "ppodnapisi/search?sK="
@@ -13,6 +14,7 @@ SEASON = 2
 EPISODE = 5
 
 search_url = "{}{} s{:02}e{:02}".format(BASE_SEARCH, SERIES_NAME, SEASON, EPISODE).replace(" ", "+")
+logging.info("Search url: {}".format(search_url))
 search_page_data = BeautifulSOAP(urllib2.urlopen(search_url).read())
 search_results = search_page_data.findAll(attrs={"class": "subtitle_page_link"})
 search_results_table = search_page_data.find(attrs={"class": "list first_column_title"})
@@ -26,4 +28,7 @@ for i, result in enumerate(results):
     download_button = BeautifulSOAP(download_page_data).find(attrs={"class": "button big download"})
     download_url = BASE_URL + download_button.get("href")
     download_data = urllib2.urlopen(download_url).read()
-    open("{} {} s{:02}e{:02}.zip".format(i, SERIES_NAME, SEASON, EPISODE), "wb").write(zlib.decompress(download_data))
+    zip_filename = "{} {} s{:02}e{:02}.zip".format(i, SERIES_NAME, SEASON, EPISODE)
+    open(zip_filename, "wb").write(download_data)
+    subprocess.call(["unzip", zip_filename])
+    logging.info("Unzipped {}".format(zip_filename))
